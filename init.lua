@@ -583,6 +583,21 @@ require('lazy').setup({
             },
           },
         },
+
+        eslint = {
+          settings = {
+            experimental = {
+              useFlatConfig = true,
+            },
+          },
+        },
+
+        volar = {
+          on_attach = function(client)
+            client.server_capabilities.documentFormattingProvider = false
+            client.server_capabilities.documentRangeFormattingProvider = false
+          end,
+        },
       }
 
       local ensure_installed = vim.tbl_keys(servers or {})
@@ -627,6 +642,7 @@ require('lazy').setup({
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
         local disable_filetypes = { c = true, cpp = true }
+
         return {
           timeout_ms = 500,
           lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
