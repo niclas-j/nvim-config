@@ -1,3 +1,20 @@
+return {
+  'catppuccin/nvim',
+  name = 'catppuccin',
+  priority = 1000,
+  init = function()
+    require('catppuccin').setup {
+      color_overrides = {
+        mocha = {
+          base = '#15151f',
+          mantle = '#313244',
+        },
+      },
+    }
+
+    vim.cmd.colorscheme 'catppuccin-mocha'
+  end,
+}
 -- return {
 --   'folke/tokyonight.nvim',
 --   priority = 1000,
@@ -25,20 +42,3 @@
 --     vim.cmd.hi 'Comment gui=none'
 --   end,
 -- }
-
-return {
-  'catppuccin/nvim',
-  name = 'catppuccin',
-  priority = 1000,
-  init = function()
-    require('catppuccin').setup {
-      color_overrides = {
-        mocha = {
-          base = '#15151f',
-        },
-      },
-    }
-
-    vim.cmd.colorscheme 'catppuccin-mocha'
-  end,
-}
