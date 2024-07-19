@@ -377,7 +377,7 @@ require('lazy').setup({
     'neovim/nvim-lspconfig',
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for Neovim
-      'williamboman/mason.nvim',
+      { 'williamboman/mason.nvim', config = true },
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
@@ -481,8 +481,11 @@ require('lazy').setup({
           -- When you move your cursor, the highlights will be cleared (the second autocommand).
           local client = vim.lsp.get_client_by_id(event.data.client_id)
           if client and client.server_capabilities.documentHighlightProvider then
+            local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = true })
+
             vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
               buffer = event.buf,
+              group = highlight_augroup,
               callback = vim.lsp.buf.document_highlight,
             })
 
@@ -490,6 +493,12 @@ require('lazy').setup({
               buffer = event.buf,
               callback = vim.lsp.buf.clear_references,
             })
+          end
+
+          if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
+            map('<leader>th', function()
+              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+            end, '[T]oggle Inlay [H]ints')
           end
         end,
       })
@@ -556,6 +565,10 @@ require('lazy').setup({
 
             return root_pattern(fname)
           end,
+        },
+
+        markdownlint = {
+          filtypes = { 'markdown' },
         },
         -- html = {
         --   filetypes = { 'html', 'vue', 'liquid' },
@@ -637,17 +650,17 @@ require('lazy').setup({
     },
     opts = {
       notify_on_error = false,
-      format_on_save = function(bufnr)
-        -- Disable "format_on_save lsp_fallback" for languages that don't
-        -- have a well standardized coding style. You can add additional
-        -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
-
-        return {
-          timeout_ms = 500,
-          lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
-        }
-      end,
+      -- format_on_save = function(bufnr)
+      --   -- Disable "format_on_save lsp_fallback" for languages that don't
+      --   -- have a well standardized coding style. You can add additional
+      --   -- languages here or re-enable it for the disabled ones.
+      --   local disable_filetypes = { c = true, cpp = true }
+      --
+      --   return {
+      --     timeout_ms = 500,
+      --     lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
+      --   }
+      -- end,
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
@@ -655,7 +668,8 @@ require('lazy').setup({
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
-        javascript = { { 'prettierd', 'prettier' } },
+        javascript = { { 'eslint', 'prettierd', 'prettier' } },
+        vue = { { 'eslint', 'prettierd', 'prettier' } },
       },
     },
   },
@@ -706,7 +720,11 @@ require('lazy').setup({
 
       cmp.setup {
         formatting = {
-          format = lspkind.cmp_format {},
+          format = lspkind.cmp_format {
+            mode = 'symbol',
+            max_width = 50,
+            symbol_map = { Copilot = '' },
+          },
         },
 
         snippet = {
@@ -742,7 +760,6 @@ require('lazy').setup({
           --  Generally you don't need this, because nvim-cmp will display
           --  completions whenever it has completion options available.
           ['<C-Space>'] = cmp.mapping.complete {},
-
           -- Think of <c-l> as moving to the right of your snippet expansion.
           --  So if you have a snippet that's like:
           --  function $name($args)
@@ -766,10 +783,10 @@ require('lazy').setup({
           --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
         },
         sources = {
-          -- { name = 'copilot' },
-          { name = 'nvim_lsp' },
-          { name = 'luasnip' },
-          { name = 'path' },
+          { name = 'nvim_lsp', max_item_count = 8, priority = 1  },
+          { name = 'luasnip', max_item_count = 5, priority = 2},
+          { name = 'path', max_item_count = 5, priority = 3},
+          -- { name = 'copilot', max_item_count = 1, priority = 4},
         },
       }
     end,

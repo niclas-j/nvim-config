@@ -42,7 +42,7 @@ return {
         italic = false,
         transparency = true,
       },
-      variant = 'main',
+      variant = "default",
       highlight_groups = {
         -- Keyword = { fg = 'iris' },
       },

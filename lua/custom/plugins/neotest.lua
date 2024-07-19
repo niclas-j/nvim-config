@@ -9,6 +9,7 @@ return {
 
     -- Adapter
     'marilari88/neotest-vitest',
+    'nvim-neotest/neotest-jest'
   },
 
   init = function()
@@ -17,6 +18,13 @@ return {
     neotest.setup {
       adapters = {
         require 'neotest-vitest',
+        require 'neotest-jest'({
+          jestCommand = "pnpm test --",
+          jestConfigFile = "jest.json",
+          cwd = function()
+            return vim.fn.getcwd()
+          end
+        })
       },
     }
 

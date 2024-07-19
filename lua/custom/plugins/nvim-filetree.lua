@@ -15,10 +15,11 @@ return {
     { '<leader>e', ':Neotree toggle<CR>' },
   },
   opts = {
-    filesystem = {
-      window = {
-        mappings = {
-          ['\\'] = 'close_window',
+    close_if_last_window = true,
+    window = {
+      filesystem = {
+        follow_current_file = {
+          enabled = true,
         },
       },
     },
